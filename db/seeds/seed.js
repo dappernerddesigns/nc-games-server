@@ -27,8 +27,8 @@ const seed = (data) => {
     review_img_url TEXT DEFAULT 'https://images.pexels.com/photos/163064/play-stone-network-networked-interactive-163064.jpeg',
     review_body VARCHAR NOT NULL,
     category VARCHAR NOT NULL REFERENCES categories(slug),
-    created_at DATE NOT NULL DEFAULT CURRENT_DATE
-    votes INT DEFAULT 0,
+    created_at DATE NOT NULL DEFAULT CURRENT_DATE,
+    votes INT DEFAULT 0
   );`)
     })
     .then(() => {
@@ -66,10 +66,10 @@ const seed = (data) => {
     .then(() => {
       const reviewsQuery = format(
         `INSERT INTO reviews
-        (title, designer, owner, review_img_url, review_body, category, created_at, votes)
-        VALUES
-        %L
-        RETURNING*;`,
+          (title, designer, owner, review_img_url, review_body, category, created_at, votes)
+          VALUES
+          %L
+          RETURNING*;`,
         reviewData.map((list) => [
           list.title,
           list.designer,
