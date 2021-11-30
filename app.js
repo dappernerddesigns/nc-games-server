@@ -5,14 +5,15 @@ app.use(express.json())
 
 const {
   handleCustomErrors,
-  handlePSQLErrors,
+  handlePsqlErrors,
+  catchAllErrors,
   handleServerErrors,
 } = require('./errors/errors')
 
 app.use('/api', apiRouter)
 
 app.use(handleCustomErrors)
-app.use(handlePSQLErrors)
+app.use(handlePsqlErrors)
 app.all('/*', catchAllErrors)
 app.use(handleServerErrors)
 
