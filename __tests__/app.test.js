@@ -39,30 +39,54 @@ describe('GET /api/categories', () => {
 })
 
 describe('GET /api/reviews/:review_id', () => {
-  test('200: Returns a review for the given id', () => {
+  test('200: Returns a single review when provided a review_id', () => {
+    let output = {
+      review: [
+        {
+          review_id: 1,
+          title: 'Agricola',
+          designer: 'Uwe Rosenberg',
+          owner: 'mallionaire',
+          review_img_url:
+            'https://www.golenbock.com/wp-content/uploads/2015/01/placeholder-user.png',
+          review_body: 'Farmyard fun!',
+          category: 'euro game',
+          created_at: '2021-01-18T00:00:00.000Z',
+          votes: 1,
+        },
+      ],
+    }
     return request(app)
       .get('/api/reviews/1')
       .expect(200)
       .then((response) => {
-        console.log(Object.keys(response.body))
-        console.log(response.body.reviews.length)
+        expect(response.body).toEqual(output)
+      })
+  })
+})
+describe('GET /api/reviews', () => {
+  test('200: Returns all reviews in the table', () => {
+    return request(app)
+      .get('/api/reviews')
+      .expect(200)
+      .then((response) => {
         const { reviews } = response.body
-
         expect(reviews).toHaveLength(13)
-        reviews.forEach((reviews) => {
-          expect.objectContaining({
-            review_id: expect.any(Number),
-            owner: expect.any(String),
-            title: expect.any(String),
-            review_id: expect.any(Number),
-            review_body: expect.any(String),
-            designer: expect.any(String),
-            review_img_url: expect.any(String),
-            category: expect.any(String),
-            created_at: expect.any(Number),
-            votes: expect.any(Number),
-            // comment_count: expect.any(Number),
-          })
+        reviews.forEach((review) => {
+          expect(review).toEqual(
+            expect.objectContaining({
+              review_id: expect.any(Number),
+              owner: expect.any(String),
+              title: expect.any(String),
+              review_id: expect.any(Number),
+              review_body: expect.any(String),
+              designer: expect.any(String),
+              review_img_url: expect.any(String),
+              category: expect.any(String),
+              created_at: expect.any(String),
+              votes: expect.any(Number),
+            }),
+          )
         })
       })
   })
