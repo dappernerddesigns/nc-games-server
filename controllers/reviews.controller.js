@@ -3,6 +3,7 @@ const {
   fetchReviewWithId,
   fetchReviews,
   updateReview,
+  findReviews,
 } = require('../models/reviews.model')
 
 exports.getReviewWithId = (req, res, next) => {
@@ -15,7 +16,11 @@ exports.getReviewWithId = (req, res, next) => {
 }
 
 exports.getReviews = (req, res, next) => {
-  fetchReviews()
+  let queries = {}
+  queries.sort_by = req.query.sort_by || 'created_at'
+  queries.order = req.query.order || 'ASC'
+
+  fetchReviews(queries)
     .then((response) => {
       res.status(200).send({ reviews: response })
     })
@@ -23,14 +28,23 @@ exports.getReviews = (req, res, next) => {
 }
 
 exports.patchReview = (req, res, next) => {
-  console.log('In the controller')
   const { review_id } = req.params
-  const votes = { inc_votes: newVote }
-  updateReview(review_id, votes)
-  console
-    .log(votes)
+  const { inc_votes } = req.body
+
+  updateReview(review_id, inc_votes)
     .then((response) => {
-      res.status(200).send({ review: response })
+      res.status(200).send({ reviews: response })
+    })
+    .catch(next)
+}
+
+exports.filterReviews = (req, res, next) => {
+  console.log('In the controller')
+  let category = {}
+  queries.category = req.query.category || 'created_at'
+  findReviews(category)
+    .then((response) => {
+      res.status(200).send({ reviews: response })
     })
     .catch(next)
 }

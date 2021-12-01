@@ -19,13 +19,32 @@ exports.fetchReviewWithId = (review_id) => {
     })
 }
 
-exports.fetchReviews = () => {
+exports.fetchReviews = (queries) => {
+  const { sort_by, order } = queries
+
+  if (
+    ![
+      'owner',
+      'title',
+      'review_id',
+      'category',
+      'created_at',
+      'votes',
+      'comment_count',
+    ].includes(sort_by)
+  ) {
+    return Promise.reject({
+      status: 400,
+      msg: 'Bad request',
+    })
+  }
+
   return db
     .query(
       `SELECT reviews.*, COUNT(comments.review_id):: INTEGER AS comment_count
       FROM comments RIGHT JOIN reviews ON reviews.review_id = comments.review_id    
       GROUP BY reviews.review_id
-      ;`,
+      ORDER BY ${sort_by} ${order};`,
     )
     .then((result) => {
       return result.rows
@@ -33,18 +52,47 @@ exports.fetchReviews = () => {
 }
 
 exports.updateReview = (review_id, votes) => {
-  console.log('In the model>>>>')
-
+  if (votes === 0) {
+    return Promise.reject({
+      status: 400,
+      msg: 'Invalid Input',
+    })
+  }
   return db
     .query(
       `UPDATE reviews
-    SET votes = $1
+    SET votes = votes + $1
     WHERE review_id = $2
     RETURNING *;`,
       [votes, review_id],
     )
     .then((result) => {
-      console.log(result.rows)
       return result.rows
+    })
+}
+
+exports.findReviews = (category) => {
+  const { category } = filterBy
+  if (!['euro game', 'social deduction', 'dexterity'].includes(filterBy)) {
+    return Promise.reject({
+      status: 400,
+      msg: 'Bad request',
+    })
+  }
+  return db
+    .query(
+      `SELECT reviews.*, COUNT(comments.review_id):: INTEGER AS comment_count
+      FROM comments RIGHT JOIN reviews ON reviews.review_id = comments.review_id
+      WHERE reviews.category = $1
+      GROUP BY reviews.review_id;`,
+      [filterBy],
+    )
+    .then(({ rows }) => {
+      if (rows.length === 0) {
+        return Promise.reject({
+          status: 404,
+          msg: 'No reviews for that category',
+        })
+      } else return rows
     })
 }

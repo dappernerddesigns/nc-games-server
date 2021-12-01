@@ -102,10 +102,10 @@ describe('GET /api/reviews/:review_id', () => {
 })
 
 describe('PATCH /api/reviews/:review_id', () => {
-  test.only('201: Patch request updates the votes count when given a review_id', () => {
+  test('200: Patch request updates the votes count when given a review_id', () => {
     let votesToAdd = { inc_votes: 3 }
     let output = {
-      review: [
+      reviews: [
         {
           review_id: 3,
           title: 'Ultimate Werewolf',
@@ -117,21 +117,40 @@ describe('PATCH /api/reviews/:review_id', () => {
           category: 'social deduction',
           created_at: '2021-01-18T00:00:00.000Z',
           votes: 8,
-          comment_count: 3,
         },
       ],
     }
     return request(app)
       .patch('/api/reviews/3')
+      .send(votesToAdd)
       .expect(200)
       .then((response) => {
         expect(response.body).toEqual(output)
       })
   })
 
-  test('400: Returns a bad request error if there are no inc_votes on the request body', () => {})
+  test('400: Returns an Invalid Input error if there are no inc_votes on the request body', () => {
+    let votesToAdd = { inc_votes: 0 }
+    return request(app)
+      .patch('/api/reviews/3')
+      .send(votesToAdd)
+      .expect(400)
+      .then((response) => {
+        expect(response.body).toEqual({ msg: 'Invalid Input' })
+      })
+  })
 
-  test('400: Returns a bad request if invalid data types are passed into the request body', () => {})
+  test('400: Returns an Invalid Input error if invalid data types are passed into the request body', () => {
+    let votesToAdd = { inc_votes: 'duckie' }
+
+    return request(app)
+      .patch('/api/reviews/3')
+      .send(votesToAdd)
+      .expect(400)
+      .then((response) => {
+        expect(response.body).toEqual({ msg: 'Invalid Input' })
+      })
+  })
 })
 
 describe('GET /api/reviews', () => {
@@ -162,20 +181,54 @@ describe('GET /api/reviews', () => {
       })
   })
 
-  test('200: Returns all reviews in a default sort order of date created', () => {})
+  test('200: Returns all reviews in a default sort order of date created', () => {
+    return request(app)
+      .get('/api/reviews')
+      .expect(200)
+      .then((response) => {
+        expect(response.body).toBeSortedBy(response.body.created_at)
+      })
+  })
 
-  test('200: Data can be ordered ASC or DESC on valid columns', () => {})
+  test.skip('200: Data can be ordered ASC or DESC on valid columns', () => {
+    return request(app)
+      .get('/api/reviews?sort_by=review_id&order=asc')
+      .expect(200)
+      .then((response) => {
+        const { body } = response
+        const { reviews } = body
 
-  test('200: Reviews can be filtered by category value', () => {})
+        expect(reviews).toBeSortedBy(reviews.review_id, {
+          descending: true,
+        })
+      })
+  })
 
-  test('400: Returns a bad request for sorting on a column that is not on the table', () => {})
+  test('400: Returns a bad request for sorting on a column that is not on the table', () => {
+    return request(app)
+      .get('/api/reviews?sort_by=mystery')
+      .expect(400)
+      .then((response) => {
+        expect(response.body).toEqual({ msg: 'Bad request' })
+      })
+  })
 
-  test('400: Returns a bad request for sorting by a category that does not exist', () => {})
+  test('200: Reviews can be filtered by category value', () => {
+    return request(app)
+      .get('/api/reviews?category=dexterity')
+      .expect(200)
+      .then((response) => {
+        const { reviews } = response.body
+        expect(reviews).toHaveLength(1)
+      })
+  })
 
-  test('400: Returns a bad request for sorting by a category that does not have any reviews', () => {})
+  test.skip('404: Returns a bad request for sorting by a category that does not exist', () => {})
+
+  test.skip('404: Returns a bad request for sorting by a category that does not have any reviews', () => {})
 })
 
-describe('GET /api/reviews/:review_id/comments', () => {
+describe.skip('GET /api/reviews/:review_id/comments', () => {
   test('200: Responds with an array of comments for the given review_id', () => {})
   test('400: Responds with a bad request if review_id does not exist, or if review does not have any comments', () => {})
 })
