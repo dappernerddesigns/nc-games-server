@@ -4,6 +4,7 @@ const {
   fetchReviews,
   updateReview,
   findReviews,
+  fetchComments,
 } = require('../models/reviews.model')
 
 exports.getReviewWithId = (req, res, next) => {
@@ -40,11 +41,20 @@ exports.patchReview = (req, res, next) => {
 
 exports.filterReviews = (req, res, next) => {
   console.log('In the controller')
-  let category = {}
-  queries.category = req.query.category || 'created_at'
+  const { category } = req.query
+
   findReviews(category)
     .then((response) => {
       res.status(200).send({ reviews: response })
+    })
+    .catch(next)
+}
+
+exports.getReviewComments = (req, res, next) => {
+  const { review_id } = req.params
+  fetchComments(review_id)
+    .then((response) => {
+      res.status(200).send({ comments: response })
     })
     .catch(next)
 }

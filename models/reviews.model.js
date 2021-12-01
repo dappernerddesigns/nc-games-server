@@ -72,8 +72,7 @@ exports.updateReview = (review_id, votes) => {
 }
 
 exports.findReviews = (category) => {
-  const { category } = filterBy
-  if (!['euro game', 'social deduction', 'dexterity'].includes(filterBy)) {
+  if (!['euro game', 'social deduction', 'dexterity'].includes(category)) {
     return Promise.reject({
       status: 400,
       msg: 'Bad request',
@@ -82,16 +81,35 @@ exports.findReviews = (category) => {
   return db
     .query(
       `SELECT reviews.*, COUNT(comments.review_id):: INTEGER AS comment_count
-      FROM comments RIGHT JOIN reviews ON reviews.review_id = comments.review_id
+      FROM reviews LEFT JOIN comments ON comments.review_id = reviews.review_id
       WHERE reviews.category = $1
       GROUP BY reviews.review_id;`,
-      [filterBy],
+      [category],
     )
     .then(({ rows }) => {
       if (rows.length === 0) {
         return Promise.reject({
           status: 404,
           msg: 'No reviews for that category',
+        })
+      }
+      console.log(rows)
+      return rows
+    })
+}
+
+exports.fetchComments = (review_id) => {
+  return db
+    .query(
+      `SELECT * FROM comments
+    WHERE comments.review_id =$1`,
+      [review_id],
+    )
+    .then(({ rows }) => {
+      if (rows.length === 0) {
+        return Promise.reject({
+          status: 400,
+          msg: 'No comments found',
         })
       } else return rows
     })

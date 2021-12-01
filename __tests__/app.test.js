@@ -213,12 +213,13 @@ describe('GET /api/reviews', () => {
       })
   })
 
-  test('200: Reviews can be filtered by category value', () => {
+  test.skip('200: Reviews can be filtered by category value', () => {
     return request(app)
       .get('/api/reviews?category=dexterity')
       .expect(200)
       .then((response) => {
         const { reviews } = response.body
+
         expect(reviews).toHaveLength(1)
       })
   })
@@ -228,7 +229,39 @@ describe('GET /api/reviews', () => {
   test.skip('404: Returns a bad request for sorting by a category that does not have any reviews', () => {})
 })
 
-describe.skip('GET /api/reviews/:review_id/comments', () => {
-  test('200: Responds with an array of comments for the given review_id', () => {})
-  test('400: Responds with a bad request if review_id does not exist, or if review does not have any comments', () => {})
+describe('GET /api/reviews/:review_id/comments', () => {
+  test('200: Responds with an array of comments for the given review_id', () => {
+    return request(app)
+      .get('/api/reviews/3/comments')
+      .expect(200)
+      .then((response) => {
+        const { comments } = response.body
+        expect(comments).toHaveLength(3)
+      })
+  })
+  test('400: Responds with a bad request if review_id does not exist, or if review does not have any comments', () => {
+    return request(app)
+      .get('/api/reviews/1/comments')
+      .expect(400)
+      .then((response) => {
+        expect(response.body).toEqual({ msg: 'No comments found' })
+      })
+  })
+})
+
+describe('POST /api/reviews/:review_id/comments', () => {
+  test('201:Responds with a new posted comment for a given review_id', () => {
+    const comment = {
+      username: 'philippaclaire9',
+      body:
+        "Prow scuttle parrel provost Sail ho shrouds spirits boom mizzenmast yardarm. Pinnace holystone mizzenmast quarter crow's nest nipperkin grog yardarm hempen halter furl. Swab barque interloper chantey doubloon starboard grog black jack gangway rutters.Deadlights jack lad schooner scallywag dance the hempen jig carouser broadside cable strike colors. Bring a spring upon her cable holystone blow the man down spanker Shiver me timbers to go on account lookout wherry doubloon chase. Belay yo-ho-ho keelhaul squiffy black spot yardarm spyglass sheet transom heave to.",
+    }
+    return request(app)
+      .post('/api/reviews/4/comments')
+      .send(comment)
+      .expect(201)
+      .then((response) => {
+        expect(response.body).toEqual(comment)
+      })
+  })
 })
