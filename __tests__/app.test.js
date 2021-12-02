@@ -190,16 +190,16 @@ describe('GET /api/reviews', () => {
       })
   })
 
-  test.skip('200: Data can be ordered ASC or DESC on valid columns', () => {
+  test('200: Data can be ordered ASC or DESC on valid columns', () => {
     return request(app)
       .get('/api/reviews?sort_by=review_id&order=asc')
       .expect(200)
       .then((response) => {
         const { body } = response
-        const { reviews } = body
+        let { reviews } = body
 
-        expect(reviews).toBeSortedBy(reviews.review_id, {
-          descending: true,
+        expect(reviews).toBeSortedBy('review_id', {
+          descending: false,
         })
       })
   })
@@ -213,7 +213,7 @@ describe('GET /api/reviews', () => {
       })
   })
 
-  test.skip('200: Reviews can be filtered by category value', () => {
+  test('200: Reviews can be filtered by category value', () => {
     return request(app)
       .get('/api/reviews?category=dexterity')
       .expect(200)
@@ -224,9 +224,14 @@ describe('GET /api/reviews', () => {
       })
   })
 
-  test.skip('404: Returns a bad request for sorting by a category that does not exist', () => {})
-
-  test.skip('404: Returns a bad request for sorting by a category that does not have any reviews', () => {})
+  test('400: Returns a bad request for sorting by a category that does not exist', () => {
+    return request(app)
+      .get('/api/reviews?category=mystery')
+      .expect(400)
+      .then((response) => {
+        expect(response.body).toEqual({ msg: 'Bad request' })
+      })
+  })
 })
 
 describe('GET /api/reviews/:review_id/comments', () => {

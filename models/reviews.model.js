@@ -20,7 +20,7 @@ exports.fetchReviewWithId = (review_id) => {
 }
 
 exports.fetchReviews = (queries) => {
-  const { sort_by, order } = queries
+  const { sort_by, order, category } = queries
 
   if (
     ![
@@ -38,17 +38,37 @@ exports.fetchReviews = (queries) => {
       msg: 'Bad request',
     })
   }
+  const queryValues = []
+  let queryStr = `SELECT reviews.*, COUNT(comments.review_id):: INTEGER AS comment_count
+      FROM comments RIGHT JOIN reviews ON reviews.review_id = comments.review_id`
 
-  return db
-    .query(
-      `SELECT reviews.*, COUNT(comments.review_id):: INTEGER AS comment_count
-      FROM comments RIGHT JOIN reviews ON reviews.review_id = comments.review_id    
-      GROUP BY reviews.review_id
-      ORDER BY ${sort_by} ${order};`,
-    )
-    .then((result) => {
-      return result.rows
-    })
+  if (category !== undefined) {
+    if (
+      ![
+        'strategy',
+        'hidden-roles',
+        'dexterity',
+        'push-your-luck',
+        'roll-and-write',
+        'deck-building',
+        'engine-building',
+      ].includes(category)
+    ) {
+      return Promise.reject({
+        status: 400,
+        msg: 'Bad request',
+      })
+    }
+    queryValues.push(category)
+    queryStr += ` WHERE category = $1`
+  }
+  queryStr += ` GROUP BY reviews.review_id
+    ORDER BY ${sort_by} ${order};`
+
+  return db.query(queryStr, queryValues).then((result) => {
+    // console.log(result.rows)
+    return result.rows
+  })
 }
 
 exports.updateReview = (review_id, votes) => {
@@ -68,33 +88,6 @@ exports.updateReview = (review_id, votes) => {
     )
     .then((result) => {
       return result.rows
-    })
-}
-
-exports.findReviews = (category) => {
-  if (!['euro game', 'social deduction', 'dexterity'].includes(category)) {
-    return Promise.reject({
-      status: 400,
-      msg: 'Bad request',
-    })
-  }
-  return db
-    .query(
-      `SELECT reviews.*, COUNT(comments.review_id):: INTEGER AS comment_count
-      FROM reviews LEFT JOIN comments ON comments.review_id = reviews.review_id
-      WHERE reviews.category = $1
-      GROUP BY reviews.review_id;`,
-      [category],
-    )
-    .then(({ rows }) => {
-      if (rows.length === 0) {
-        return Promise.reject({
-          status: 404,
-          msg: 'No reviews for that category',
-        })
-      }
-      console.log(rows)
-      return rows
     })
 }
 
