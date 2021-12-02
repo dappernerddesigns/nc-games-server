@@ -66,7 +66,6 @@ exports.fetchReviews = (queries) => {
     ORDER BY ${sort_by} ${order};`
 
   return db.query(queryStr, queryValues).then((result) => {
-    // console.log(result.rows)
     return result.rows
   })
 }
