@@ -261,7 +261,29 @@ describe('POST /api/reviews/:review_id/comments', () => {
       .send(comment)
       .expect(201)
       .then((response) => {
-        expect(response.body).toEqual(comment)
+        const { comments } = response.body
+        expect(comments).toHaveLength(1)
+        comments.forEach((comments) => {
+          expect(comments).toEqual(
+            expect.objectContaining({
+              comment_id: expect.any(Number),
+              author: expect.any(String),
+              review_id: expect.any(Number),
+              votes: expect.any(Number),
+              created_at: expect.any(String),
+              body: expect.any(String),
+            }),
+          )
+        })
       })
+  })
+})
+
+describe('DELETE /api/comments/:comment_id', () => {
+  test('204: Removes comment by id and returns an empty body', () => {
+    return request(app).delete('/api/comments/2').expect(204)
+    // .then((response)=>{
+
+    // })
   })
 })
