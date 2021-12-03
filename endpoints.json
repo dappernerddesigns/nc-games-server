@@ -82,6 +82,27 @@
       ]
     }
   },
+  "GET /api/users/:username": {
+    "description": "Provides username, avatar_url and name of a given user",
+    "queries": [
+      "tickle122",
+      "grumpy19",
+      "happyamy2016",
+      "cooljmessy",
+      "weegembump",
+      "jessjelly"
+    ],
+    "exampleResponse": {
+      "Users": [
+        { "username": "mallionaire" },
+        { "name": "haz" },
+        {
+          "avatar_url": "https://www.healthytherapies.com/wp-content/uploads/2016/06/Lime3.jpg"
+        }
+      ]
+    }
+  },
+
   "PENDING endpoints that require frontend": {
     "PATCH /api/reviews/:review_id": "Will provide the ability to both upvote and downvote reviews",
     "POST /api/reviews/:review_id/comments": "Will provide functionality to add a comment to a review when providing review_id",

@@ -343,3 +343,50 @@ describe('GET /api/users/:username', () => {
       })
   })
 })
+
+describe('PATCH /api/comments/:comment_id', () => {
+  test('200: Patch request updates the vote count on a given comment', () => {
+    let upVotes = { inc_votes: 3 }
+    let outPut = {
+      Comments: [
+        {
+          body: 'I loved this game too!',
+          votes: 19,
+          author: 'bainesface',
+          review_id: 2,
+          created_at: new Date(1511354613389),
+        },
+      ],
+    }
+    request(app)
+      .patch('/api/comments/1')
+      .send(upVotes)
+      .expect(200)
+      .then((response) => {
+        expect(response.body).toEqual(outPut)
+      })
+  })
+
+  test('400: Returns an Invalid Input error if there are no inc_votes on the request body', () => {
+    let upVotes = { inc_votes: 0 }
+    return request(app)
+      .patch('/api/comments/1')
+      .send(upVotes)
+      .expect(400)
+      .then((response) => {
+        expect(response.body).toEqual({ msg: 'Invalid Input' })
+      })
+  })
+
+  test('400: Returns an Invalid Input error if invalid data types are passed into the request body', () => {
+    let upVotes = { inc_votes: 'duckie' }
+
+    return request(app)
+      .patch('/api/comments/1')
+      .send(upVotes)
+      .expect(400)
+      .then((response) => {
+        expect(response.body).toEqual({ msg: 'Invalid Input' })
+      })
+  })
+})
