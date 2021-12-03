@@ -292,3 +292,23 @@ describe('DELETE /api/comments/:comment_id', () => {
     // })
   })
 })
+
+describe('GET /api/users', () => {
+  test('200: Responds with a list of usernames from the users table', () => {
+    let outPut = {
+      Users: [
+        { username: 'mallionaire' },
+        { username: 'philippaclaire9' },
+        { username: 'bainesface' },
+        { username: 'dav3rid' },
+      ],
+    }
+    return request(app)
+      .get('/api/users')
+      .expect(200)
+      .then((response) => {
+        const users = response.body
+        expect(users).toEqual(outPut)
+      })
+  })
+})
