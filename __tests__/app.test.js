@@ -96,7 +96,7 @@ describe('GET /api/reviews/:review_id', () => {
       .get('/api/reviews/999')
       .expect(404)
       .then((response) => {
-        expect(response.body).toEqual({ msg: 'Game not found in database' })
+        expect(response.body).toEqual({ msg: 'Review not found in database' })
       })
   })
 })
@@ -244,10 +244,10 @@ describe('GET /api/reviews/:review_id/comments', () => {
         expect(comments).toHaveLength(3)
       })
   })
-  test('400: Responds with a bad request if review_id does not exist, or if review does not have any comments', () => {
+  test.skip('404: Responds with a bad request if review_id does not exist, or if review does not have any comments', () => {
     return request(app)
       .get('/api/reviews/1/comments')
-      .expect(400)
+      .expect(404)
       .then((response) => {
         expect(response.body).toEqual({ msg: 'No comments found' })
       })
@@ -309,6 +309,37 @@ describe('GET /api/users', () => {
       .then((response) => {
         const users = response.body
         expect(users).toEqual(outPut)
+      })
+  })
+})
+
+describe('GET /api/users/:username', () => {
+  test('200: Responds with the username, avatar_url and name of a given username', () => {
+    let outPut = {
+      Users: [
+        {
+          username: 'mallionaire',
+          name: 'haz',
+          avatar_url:
+            'https://www.healthytherapies.com/wp-content/uploads/2016/06/Lime3.jpg',
+        },
+      ],
+    }
+
+    return request(app)
+      .get('/api/users/mallionaire')
+      .expect(200)
+      .then((response) => {
+        expect(response.body).toEqual(outPut)
+      })
+  })
+
+  test('404: Responds with a 404 message if username is not found in the database', () => {
+    return request(app)
+      .get('/api/users/magicaltrevor')
+      .expect(404)
+      .then((response) => {
+        expect(response.body).toEqual({ msg: 'User not found in database' })
       })
   })
 })

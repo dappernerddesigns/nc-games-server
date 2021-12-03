@@ -70,6 +70,18 @@
       ]
     }
   },
+  "GET /api/users": {
+    "description": "serves an array of usernames from the users table",
+    "queries": [],
+    "exampleResponse": {
+      "Users": [
+        { "username": "mallionaire" },
+        { "username": "philippaclaire9" },
+        { "username": "bainesface" },
+        { "username": "dav3rid" }
+      ]
+    }
+  },
   "PENDING endpoints that require frontend": {
     "PATCH /api/reviews/:review_id": "Will provide the ability to both upvote and downvote reviews",
     "POST /api/reviews/:review_id/comments": "Will provide functionality to add a comment to a review when providing review_id",

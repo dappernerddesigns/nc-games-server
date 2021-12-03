@@ -59,7 +59,7 @@ const seed = (data) => {
         VALUES
         %L
         RETURNING*;`,
-        userData.map((list) => [list.username, list.name, list.avatar_url]),
+        userData.map((list) => [list.username, list.avatar_url, list.name]),
       )
       return db.query(usersQuery)
     })

@@ -13,7 +13,7 @@ exports.fetchReviewWithId = (review_id) => {
       if (rows.length === 0) {
         return Promise.reject({
           status: 404,
-          msg: 'Game not found in database',
+          msg: 'Review not found in database',
         })
       } else return rows
     })
