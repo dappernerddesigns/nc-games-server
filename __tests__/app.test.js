@@ -99,6 +99,15 @@ describe('GET /api/reviews/:review_id', () => {
         expect(response.body).toEqual({ msg: 'Review not found in database' })
       })
   })
+
+  test('400: Returns a 400 Bad request when id is not a valid input', () => {
+    return request(app)
+      .get('/api/reviews/monster')
+      .expect(400)
+      .then((response) => {
+        expect(response.body).toEqual({ msg: 'Invalid Input' })
+      })
+  })
 })
 
 describe('PATCH /api/reviews/:review_id', () => {
@@ -244,12 +253,23 @@ describe('GET /api/reviews/:review_id/comments', () => {
         expect(comments).toHaveLength(3)
       })
   })
-  test.skip('404: Responds with a bad request if review_id does not exist, or if review does not have any comments', () => {
+  test('404: Responds with 404 review does not have any comments', () => {
     return request(app)
       .get('/api/reviews/1/comments')
       .expect(404)
       .then((response) => {
         expect(response.body).toEqual({ msg: 'No comments found' })
+      })
+  })
+
+  test('400: Responds with a Bad request if review_id is not a number', () => {
+    return request(app)
+      .get('/api/reviews/bobby/comments')
+      .expect(400)
+      .then((response) => {
+        expect(response.body).toEqual({
+          msg: 'Invalid Input',
+        })
       })
   })
 })
@@ -344,7 +364,7 @@ describe('GET /api/users/:username', () => {
   })
 })
 
-describe('PATCH /api/comments/:comment_id', () => {
+describe.skip('PATCH /api/comments/:comment_id', () => {
   test('200: Patch request updates the vote count on a given comment', () => {
     let upVotes = { inc_votes: 3 }
     let outPut = {
@@ -363,6 +383,7 @@ describe('PATCH /api/comments/:comment_id', () => {
       .send(upVotes)
       .expect(200)
       .then((response) => {
+        console.log(response.body)
         expect(response.body).toEqual(outPut)
       })
   })
