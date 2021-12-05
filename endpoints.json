@@ -1,5 +1,4 @@
 {
-{  "This is the home page of a server project from the backend module of the Northcoder's bootcamp. Below are a list of the available search options from this api of game reviews. A PSQL database of four tables has been queried using the MVC method."},
   "GET /api": {
     "description": "serves up a json representation of all the available endpoints of the api"
   },
