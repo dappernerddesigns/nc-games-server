@@ -25,7 +25,7 @@ describe('GET /api/categories', () => {
         },
         {
           description: 'Games suitable for children',
-          slug: "children's games",
+          slug: 'childrens games',
         },
       ],
     }
@@ -51,7 +51,7 @@ describe('GET /api/reviews/:review_id', () => {
             'https://www.golenbock.com/wp-content/uploads/2015/01/placeholder-user.png',
           review_body: "We couldn't find the werewolf!",
           category: 'social deduction',
-          created_at: '2021-01-18T00:00:00.000Z',
+          created_at: '2021-01-18T10:01:41.251Z',
           votes: 5,
           comment_count: 3,
         },
@@ -77,7 +77,7 @@ describe('GET /api/reviews/:review_id', () => {
             'https://www.golenbock.com/wp-content/uploads/2015/01/placeholder-user.png',
           review_body: "We couldn't find the werewolf!",
           category: 'social deduction',
-          created_at: '2021-01-18T00:00:00.000Z',
+          created_at: '2021-01-18T10:01:41.251Z',
           votes: 5,
           comment_count: 3,
         },
@@ -124,7 +124,7 @@ describe('PATCH /api/reviews/:review_id', () => {
             'https://www.golenbock.com/wp-content/uploads/2015/01/placeholder-user.png',
           review_body: "We couldn't find the werewolf!",
           category: 'social deduction',
-          created_at: '2021-01-18T00:00:00.000Z',
+          created_at: '2021-01-18T10:01:41.251Z',
           votes: 8,
         },
       ],
@@ -158,6 +158,45 @@ describe('PATCH /api/reviews/:review_id', () => {
       .expect(400)
       .then((response) => {
         expect(response.body).toEqual({ msg: 'Invalid Input' })
+      })
+  })
+
+  test('404: Returns a 404 for a nonexistent ID', () => {
+    let votesToAdd = { inc_votes: 4 }
+
+    return request(app)
+      .patch('/api/reviews/9999')
+      .send(votesToAdd)
+      .expect(404)
+      .then((response) => {
+        expect(response.body).toEqual({ msg: 'Review not found' })
+      })
+  })
+
+  test('200: Returns a 200 and no effect to review body when inc votes key is missing.', () => {
+    let votesToAdd = {}
+    let output = {
+      reviews: [
+        {
+          review_id: 3,
+          title: 'Ultimate Werewolf',
+          designer: 'Akihisa Okui',
+          owner: 'bainesface',
+          review_img_url:
+            'https://www.golenbock.com/wp-content/uploads/2015/01/placeholder-user.png',
+          review_body: "We couldn't find the werewolf!",
+          category: 'social deduction',
+          created_at: '2021-01-18T10:01:41.251Z',
+          votes: 5,
+        },
+      ],
+    }
+    return request(app)
+      .patch('/api/reviews/3')
+      .send(votesToAdd)
+      .expect(200)
+      .then((response) => {
+        expect(response.body).toEqual(output)
       })
   })
 })
@@ -195,13 +234,15 @@ describe('GET /api/reviews', () => {
       .get('/api/reviews')
       .expect(200)
       .then((response) => {
-        expect(response.body).toBeSortedBy(response.body.created_at)
+        const { body } = response
+        let { reviews } = body
+        expect(reviews).toBeSortedBy('created_at', { descending: false })
       })
   })
 
   test('200: Data can be ordered ASC or DESC on valid columns', () => {
     return request(app)
-      .get('/api/reviews?sort_by=review_id&order=asc')
+      .get('/api/reviews?sort_by=review_id&order=ASC')
       .expect(200)
       .then((response) => {
         const { body } = response
@@ -233,12 +274,32 @@ describe('GET /api/reviews', () => {
       })
   })
 
-  test('400: Returns a bad request for sorting by a category that does not exist', () => {
+  test('404: Returns not found for sorting by a category that does not exist', () => {
     return request(app)
       .get('/api/reviews?category=mystery')
+      .expect(404)
+      .then((response) => {
+        expect(response.body).toEqual({ msg: 'Category does not exist' })
+      })
+  })
+
+  test('400: Returns a bad request for sorting by an invalid order', () => {
+    return request(app)
+      .get('/api/reviews?sort_by=review_id&order=bananas')
       .expect(400)
       .then((response) => {
         expect(response.body).toEqual({ msg: 'Bad request' })
+      })
+  })
+
+  test('200: Returns an empty array of reviews when passed a valid category with no reviews', () => {
+    return request(app)
+      .get('/api/reviews?category=childrens%20games')
+      .expect(200)
+      .then((response) => {
+        const { reviews } = response.body
+
+        expect(reviews).toStrictEqual([])
       })
   })
 })
@@ -253,15 +314,23 @@ describe('GET /api/reviews/:review_id/comments', () => {
         expect(comments).toHaveLength(3)
       })
   })
-  test('404: Responds with 404 review does not have any comments', () => {
+  test('404: Responds with 404 if review id does not exist', () => {
     return request(app)
-      .get('/api/reviews/1/comments')
+      .get('/api/reviews/999/comments')
       .expect(404)
       .then((response) => {
         expect(response.body).toEqual({ msg: 'No comments found' })
       })
   })
 
+  test.skip('200: Responds with 200 and an empty array if review does not have any comments', () => {
+    return request(app)
+      .get('/api/reviews/1/comments')
+      .expect(200)
+      .then((response) => {
+        expect(response.body).toEqual([])
+      })
+  })
   test('400: Responds with a Bad request if review_id is not a number', () => {
     return request(app)
       .get('/api/reviews/bobby/comments')
@@ -300,6 +369,21 @@ describe('POST /api/reviews/:review_id/comments', () => {
             }),
           )
         })
+      })
+  })
+
+  test('400: Returns a 400 for an invalid id', () => {
+    const comment = {
+      username: 'philippaclaire9',
+      body:
+        "Prow scuttle parrel provost Sail ho shrouds spirits boom mizzenmast yardarm. Pinnace holystone mizzenmast quarter crow's nest nipperkin grog yardarm hempen halter furl. Swab barque interloper chantey doubloon starboard grog black jack gangway rutters.Deadlights jack lad schooner scallywag dance the hempen jig carouser broadside cable strike colors. Bring a spring upon her cable holystone blow the man down spanker Shiver me timbers to go on account lookout wherry doubloon chase. Belay yo-ho-ho keelhaul squiffy black spot yardarm spyglass sheet transom heave to.",
+    }
+    return request(app)
+      .post('/api/reviews/banana/comments')
+      .send(comment)
+      .expect(400)
+      .then((response) => {
+        expect(response.body).toEqual({ msg: 'Invalid Id' })
       })
   })
 })

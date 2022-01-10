@@ -27,7 +27,7 @@ const seed = (data) => {
     review_img_url TEXT DEFAULT 'https://images.pexels.com/photos/163064/play-stone-network-networked-interactive-163064.jpeg',
     review_body VARCHAR NOT NULL,
     category VARCHAR NOT NULL REFERENCES categories(slug),
-    created_at DATE NOT NULL DEFAULT CURRENT_DATE,
+    created_at TIMESTAMP DEFAULT NOW(),
     votes INT DEFAULT 0
   );`)
     })
@@ -37,7 +37,7 @@ const seed = (data) => {
     author VARCHAR NOT NULL REFERENCES users(username),
     review_id INT NOT NULL REFERENCES reviews(review_id),
     votes INT DEFAULT 0,
-    created_at DATE NOT NULL DEFAULT CURRENT_DATE,
+    created_at TIMESTAMP DEFAULT NOW(),
     body VARCHAR NOT NULL
     );`)
     })

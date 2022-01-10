@@ -31,7 +31,8 @@ exports.fetchReviews = (queries) => {
       'created_at',
       'votes',
       'comment_count',
-    ].includes(sort_by)
+    ].includes(sort_by) ||
+    !['ASC', 'DESC'].includes(order)
   ) {
     return Promise.reject({
       status: 400,
@@ -52,11 +53,14 @@ exports.fetchReviews = (queries) => {
         'roll-and-write',
         'deck-building',
         'engine-building',
+        'euro game',
+        'social deduction',
+        'childrens games',
       ].includes(category)
     ) {
       return Promise.reject({
-        status: 400,
-        msg: 'Bad request',
+        status: 404,
+        msg: 'Category does not exist',
       })
     }
     queryValues.push(category)
@@ -76,6 +80,8 @@ exports.updateReview = (review_id, votes) => {
       status: 400,
       msg: 'Invalid Input',
     })
+  } else if (votes === undefined) {
+    votes = 0
   }
   return db
     .query(
@@ -86,6 +92,12 @@ exports.updateReview = (review_id, votes) => {
       [votes, review_id],
     )
     .then((result) => {
+      if (result.rows.length === 0) {
+        return Promise.reject({
+          status: 404,
+          msg: 'Review not found',
+        })
+      }
       return result.rows
     })
 }
@@ -100,7 +112,7 @@ exports.fetchComments = (review_id) => {
     .then(({ rows }) => {
       if (rows.length === 0) {
         return Promise.reject({
-          status: 404,
+          status: '404',
           msg: 'No comments found',
         })
       } else return rows
@@ -116,7 +128,13 @@ exports.writeComment = (username, body, review_id) => {
   RETURNING *;`,
       [username, body, review_id],
     )
-    .then((result) => {
-      return result.rows
+    .then(({ rows }) => {
+      if (typeof review_id !== 'Number') {
+        return Promise.reject({
+          status: '400',
+          msg: 'Invalid Id',
+        })
+      }
+      return rows
     })
 }
