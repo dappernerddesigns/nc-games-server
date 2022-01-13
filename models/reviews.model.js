@@ -130,12 +130,6 @@ exports.writeComment = (username, body, review_id) => {
       [username, body, review_id],
     )
     .then(({ rows }) => {
-      if (typeof review_id !== 'Number') {
-        return Promise.reject({
-          status: '400',
-          msg: 'Invalid Id',
-        })
-      }
       return rows
     })
 }

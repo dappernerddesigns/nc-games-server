@@ -305,7 +305,7 @@ describe('GET /api/reviews', () => {
 })
 
 describe('GET /api/reviews/:review_id/comments', () => {
-  test.only('200: Responds with an array of comments for the given review_id', () => {
+  test('200: Responds with an array of comments for the given review_id', () => {
     return request(app)
       .get('/api/reviews/3/comments')
       .expect(200)
@@ -344,7 +344,7 @@ describe('GET /api/reviews/:review_id/comments', () => {
   })
 })
 
-describe('POST /api/reviews/:review_id/comments', () => {
+describe.only('POST /api/reviews/:review_id/comments', () => {
   test('201:Responds with a new posted comment for a given review_id', () => {
     const comment = {
       username: 'philippaclaire9',
