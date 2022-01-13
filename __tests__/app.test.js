@@ -305,12 +305,13 @@ describe('GET /api/reviews', () => {
 })
 
 describe('GET /api/reviews/:review_id/comments', () => {
-  test('200: Responds with an array of comments for the given review_id', () => {
+  test.only('200: Responds with an array of comments for the given review_id', () => {
     return request(app)
       .get('/api/reviews/3/comments')
       .expect(200)
       .then((response) => {
         const { comments } = response.body
+        console.log(comments)
         expect(comments).toHaveLength(3)
       })
   })

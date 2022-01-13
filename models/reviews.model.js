@@ -106,7 +106,8 @@ exports.fetchComments = (review_id) => {
   return db
     .query(
       `SELECT * FROM comments
-    WHERE comments.review_id =$1`,
+    WHERE comments.review_id =$1
+    ORDER BY created_at DESC`,
       [review_id],
     )
     .then(({ rows }) => {
