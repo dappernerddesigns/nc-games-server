@@ -324,12 +324,12 @@ describe('GET /api/reviews/:review_id/comments', () => {
       })
   })
 
-  test.skip('200: Responds with 200 and an empty array if review does not have any comments', () => {
+  test.only('200: Responds with 200 and an empty array if review does not have any comments', () => {
     return request(app)
       .get('/api/reviews/1/comments')
       .expect(200)
       .then((response) => {
-        expect(response.body).toEqual([])
+        expect(response.body).toEqual({ comments: [] })
       })
   })
   test('400: Responds with a Bad request if review_id is not a number', () => {
@@ -344,7 +344,7 @@ describe('GET /api/reviews/:review_id/comments', () => {
   })
 })
 
-describe.only('POST /api/reviews/:review_id/comments', () => {
+describe('POST /api/reviews/:review_id/comments', () => {
   test('201:Responds with a new posted comment for a given review_id', () => {
     const comment = {
       username: 'philippaclaire9',
@@ -449,7 +449,7 @@ describe('GET /api/users/:username', () => {
   })
 })
 
-describe.skip('PATCH /api/comments/:comment_id', () => {
+describe('PATCH /api/comments/:comment_id', () => {
   test('200: Patch request updates the vote count on a given comment', () => {
     let upVotes = { inc_votes: 3 }
     let outPut = {

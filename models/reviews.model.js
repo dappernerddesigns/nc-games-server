@@ -111,12 +111,14 @@ exports.fetchComments = (review_id) => {
       [review_id],
     )
     .then(({ rows }) => {
-      if (rows.length === 0) {
-        return Promise.reject({
-          status: '404',
-          msg: 'No comments found',
-        })
-      } else return rows
+      // if (review_id.includes(match)) {
+      //   console.log('in the if block')
+      //   return Promise.reject({
+      //     status: '404',
+      //     msg: 'No comments found',
+      //   })
+      // } else
+      return rows
     })
 }
 
