@@ -10,7 +10,7 @@ Once complete the data has been pushed and hosted on heroku as a live and intera
 
 ### Hosted version available:
 
-https://dappernerddesigns-nc-games.herokuapp.com/api
+https://dapper-nerd-designs-nc-games.onrender.com/api/
 
 ---
 
@@ -32,21 +32,21 @@ Several packages have been installed to make this repo work. These have already 
 
 For your information, the used npm packages are:
 
-- dotenv
-- express
-- pg
-- pg-format
+-   dotenv
+-   express
+-   pg
+-   pg-format
 
 _For testing_
 
-- jest
-- jest-sorted
-- supertest
+-   jest
+-   jest-sorted
+-   supertest
 
 In order to fully run the files create the following two files in the route folder:
 
-- .env.test
-- .env.dev
+-   .env.test
+-   .env.dev
 
 These files will define the PGDATABASE file and whether the test or development data is being seeded. Inside each file type PGDATABASE=[type appropriate database name here] The names of the test and development databases are available in the setup.sql file.
 
@@ -56,17 +56,17 @@ These files are not included in the repo, if they are not created there will be 
 
 Some scripts have been added to the package.json to make setting up the database easier. In the terminal run the following scripts in order.
 
-- npm run setup-dbs
+-   npm run setup-dbs
 
 _This will drop the created database and then create a new and empty database_
 
-- npm run seed
+-   npm run seed
 
 _This will run the seed function to create tables and insert development data into the created tables_
 
 To run the tests written for the created endpoints run:
 
-- npm test
+-   npm test
 
 The test script will reseed the database with test data and use the .env.test file to swap the PGDATABASE environment variable.
 
